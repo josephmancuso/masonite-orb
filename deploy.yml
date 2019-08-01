@@ -1,0 +1,11 @@
+# Orb 'circleci/hello-build@0.0.5' resolved to 'circleci/hello-build@0.0.5'
+version: 2.1
+
+workflows:
+  version: 2
+  btd:
+    jobs:
+      - orb-tools/publish:
+          orb-path: .circleci/config.yml
+          orb-ref: masonite/trigger@dev:latest
+          validate: true

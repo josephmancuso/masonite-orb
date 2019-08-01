@@ -1,0 +1,12 @@
+version: 2.1
+
+orbs:
+  masonite: masonite/trigger@dev:latest
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - masonite/trigger:
+          repo: masoniteframework/api
+          branch: "2.2"
