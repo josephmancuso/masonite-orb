@@ -1,0 +1,63 @@
+# Orb 'circleci/hello-build@0.0.5' resolved to 'circleci/hello-build@0.0.5'
+version: 2.1
+
+executors:
+  masonite-trigger:
+    parameters:
+      CIRCLE_TOKEN: 
+        type: string
+        default: $CIRCLE_TOKEN
+    docker:
+      - image: masoniteproject/orb:latest 
+
+commands:
+  configure-pypirc:
+    parameters:
+      username:
+        type: string
+        default: $PYPI_USERNAME
+      password:
+        type: string
+        default: $PYPI_PASSWORD
+    steps:
+      - run: echo "[distutils]" >> ~/.pypirc
+      - run: echo "index-servers =" >> ~/.pypirc
+      - run: echo "    pypi" >> ~/.pypirc
+      - run: echo "    pypitest" >> ~/.pypirc
+      - run: echo "[pypi]" >> ~/.pypirc
+      - run: echo "repository=https://pypi.python.org/pypi" >> ~/.pypirc
+      - run: echo "username=<< parameters.username >> " >> ~/.pypirc
+      - run: echo "password=<< parameters.password >> " >> ~/.pypirc
+      - run: python setup.py sdist upload
+
+jobs:
+  trigger:
+    parameters:
+      repo:
+        type: string
+        default: 'masoniteframework/api'
+      branch:
+        type: string
+        default: master
+      environment:
+        type: string
+        default: ""
+    executor: masonite-trigger
+    steps:
+    - run:
+        command: python /trigger_build.py --repo << parameters.repo >> --branch << parameters.branch >> --environment << parameters.environment >>
+  deploy:
+    parameters:
+      username:
+        type: string
+        default: $PYPI_USERNAME
+      password:
+        type: string
+        default: $PYPI_PASSWORD
+    executor: masonite-trigger
+    steps:
+      - checkout
+      - configure-pypirc:
+          username: << parameters.username >>
+          password: << parameters.password >>
+      

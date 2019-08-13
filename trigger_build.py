@@ -43,6 +43,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-r", "--repo", help="Repository name")
 parser.add_argument("-b", "--branch", help="Branch name")
 parser.add_argument("-t", "--token", help="Circle CI Token")
+parser.add_argument("-e", "--environment", help="String Space Separated Environment", default="")
 parser.add_argument('-a', '--build', action='append',
                     help='Set Build Arguments')
 parser.add_argument(
@@ -66,6 +67,16 @@ if not token:
 
 parameters = {}
 for argument in args.build or []:
+    if not '=' in argument:
+        print(
+            "ERROR: '--build' argument must contain a '=' sign. Got '{}'".format(argument))
+        exit(1)
+    key = argument.split('=')[0]
+    value = argument.split('=')[1]
+
+    parameters.update({key: value})
+
+for argument in args.environment.split(' '):
     if not '=' in argument:
         print(
             "ERROR: '--build' argument must contain a '=' sign. Got '{}'".format(argument))
